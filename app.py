@@ -3,6 +3,7 @@ import random
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 load_dotenv() # .env dosyasındaki değişkenleri yükle
 
@@ -16,6 +17,9 @@ if not app.config['SQLALCHEMY_DATABASE_URI']:
 # app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'sslmode': 'require'} # Render'da genellikle gerekmez
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'varsayilan_cok_gizli_bir_anahtar')
+socketio = SocketIO(app, async_mode='eventlet')
 
 # --- Veritabanı Modeli ---
 class MultiplayerGame(db.Model):
