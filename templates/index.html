@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 Rakamlı +/- Oyunu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>3 Rakamlı +/- Oyunu</h1>
+    <p>Rakamları farklı 3 basamaklı gizli sayıyı tahmin et!</p>
+    <p>+1: Doğru rakam, doğru yer. -1: Doğru rakam, yanlış yer.</p>
+
+    <div id="game-area">
+        <label for="guess-input">Tahmininiz (3 Rakam):</label>
+        <input type="text" id="guess-input" maxlength="3" pattern="\d{3}" title="3 rakam girin">
+        <button id="guess-button">Tahmin Et</button>
+        <button id="new-game-button">Yeni Oyun</button>
+    </div>
+
+    <div id="message-area">
+        <!-- Mesajlar buraya gelecek -->
+    </div>
+
+    <h2>Tahmin Geçmişi</h2>
+    <ul id="guesses-list">
+        <!-- Tahminler buraya eklenecek -->
+    </ul>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
