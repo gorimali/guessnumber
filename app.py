@@ -18,15 +18,35 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # --- Veritabanı Modeli ---
-class Game(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    secret_number = db.Column(db.String(3), nullable=False)
-    attempts = db.Column(db.Integer, default=0)
-    is_won = db.Column(db.Boolean, default=False)
-    # created_at = db.Column(db.DateTime, server_default=db.func.now()) # İsterseniz ekleyebilirsiniz
+class MultiplayerGame(db.Model):
+    id = db.Column(db.String(10), primary_key=True) # Rastgele bir ID (örn: ABCDE123)
+    player1_sid = db.Column(db.String) # Player 1'in SocketIO Session ID'si
+    player2_sid = db.Column(db.String) # Player 2'nin SocketIO Session ID'si
+    player1_secret = db.Column(db.String(3))
+    player2_secret = db.Column(db.String(3))
+    current_turn = db.Column(db.String) # player1_sid veya player2_sid olabilir
+    player1_guesses = db.Column(db.JSON, default=list) # [{guess: '123', result: {'plus': 1, 'minus': 0}}]
+    player2_guesses = db.Column(db.JSON, default=list) # Aynı format
+    status = db.Column(db.String, default='waiting') # waiting, active, finished
+    winner_sid = db.Column(db.String, nullable=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    def __repr__(self):
-        return f'<Game {self.id}>'
+    def get_opponent_secret(self, player_sid):
+        return self.player2_secret if player_sid == self.player1_sid else self.player1_secret
+
+    def get_opponent_sid(self, player_sid):
+         return self.player2_sid if player_sid == self.player1_sid else self.player1_sid
+
+    def add_guess(self, player_sid, guess, result):
+        if player_sid == self.player1_sid:
+            # JSON kolonunu güncellemek için özel dikkat gerekebilir
+            guesses = list(self.player1_guesses) # Kopyasını al
+            guesses.append({'guess': guess, 'result': result})
+            self.player1_guesses = guesses
+        else:
+            guesses = list(self.player2_guesses)
+            guesses.append({'guess': guess, 'result': result})
+            self.player2_guesses = guesses
 
 # --- Yardımcı Fonksiyonlar ---
 def generate_secret_number():
