@@ -1,0 +1,98 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+#game-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Elemanlar arası boşluk */
+    margin-bottom: 20px;
+}
+
+#guess-input {
+    padding: 8px;
+    font-size: 1.2em;
+    width: 80px; /* Genişliği ayarla */
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#new-game-button {
+    background-color: #28a745;
+}
+
+#new-game-button:hover {
+    background-color: #218838;
+}
+
+
+#message-area {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    text-align: center;
+    min-height: 40px; /* İçerik olmadığında bile yer kaplasın */
+    font-weight: bold;
+}
+
+#guesses-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 15px;
+    max-height: 300px; /* Çok fazla tahmin olursa kaydırma çubuğu çıkar */
+    overflow-y: auto; /* Dikey kaydırma */
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+#guesses-list li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+#guesses-list li:last-child {
+    border-bottom: none;
+}
+
+/* Hata mesajları için (opsiyonel) */
+.error {
+    color: red;
+    font-weight: bold;
+}
