@@ -1,5 +1,9 @@
 Flask
 Flask-SQLAlchemy
-psycopg2-binary  # PostgreSQL sürücüsü (Render'da çalışır)
-python-dotenv    # .env dosyasını okumak için
-gunicorn         # Render'da uygulamayı çalıştırmak için WSGI sunucusu
+psycopg2-binary
+python-dotenv
+gunicorn
+Flask-SocketIO  # Eklendi
+eventlet        # Eklendi (veya gevent)
+Flask-Cors      # SocketIO CORS için gerekebilir (opsiyonel, socketio init'te de ayarlanabilir)
+uuid            # Python standart kütüphanesi ama belirtmek iyi olabilir
