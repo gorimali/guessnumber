@@ -3,30 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Rakamlı +/- Oyunu</title>
+    <title>+/- Oyunu (Multiplayer)</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Ekstra stiller (isteğe bağlı) */
+        #setup-area, #game-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+        }
+        #game-area { display: none; } /* Başlangıçta oyun alanı gizli */
+        .guess-list-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; /* Listeler arası boşluk */
+            margin-top: 20px;
+        }
+        .guess-list {
+             width: 48%; /* İki liste yan yana sığsın */
+             border: 1px solid #eee;
+             padding: 10px;
+             background-color: #fff;
+             border-radius: 4px;
+             max-height: 250px;
+             overflow-y: auto;
+        }
+        .guess-list h3 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.1em;
+            color: #555;
+        }
+        #opponent-secret-label {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+            text-align: center;
+            display: none; /* Başlangıçta gizli */
+        }
+         #game-id-display {
+             margin-top: 10px;
+             padding: 8px;
+             background-color: #f0f0f0;
+             border: 1px solid #ddd;
+             text-align: center;
+             font-family: monospace;
+             display: none; /* Başlangıçta gizli */
+         }
+         .input-group {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+         }
+         .input-group label {
+            flex-basis: 120px; /* Etiket genişliği */
+            text-align: right;
+            margin-right: 5px;
+         }
+         .input-group input[type="text"],
+         .input-group input[type="number"] { /* number yerine text kullanıyoruz ama stillendirme benzer */
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+         }
+         .button-group {
+            margin-top: 15px;
+            text-align: center;
+         }
+         #turn-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-radius: 4px;
+         }
+
+    </style>
 </head>
 <body>
-    <h1>3 Rakamlı +/- Oyunu</h1>
-    <p>Rakamları farklı 3 basamaklı gizli sayıyı tahmin et!</p>
-    <p>+1: Doğru rakam, doğru yer. -1: Doğru rakam, yanlış yer.</p>
+    <h1>+/- Oyunu (Çok Oyunculu)</h1>
 
+    <!-- Mesaj Alanı -->
+    <div id="message-area">Bağlanıyor...</div>
+
+    <!-- Oyun Kurma / Katılma Alanı -->
+    <div id="setup-area">
+        <h2>Oyun Kurulumu</h2>
+        <div class="input-group">
+            <label for="secret-input">Gizli Sayınız (3 Farklı Rakam):</label>
+            <input type="text" id="secret-input" maxlength="3" pattern="\d{3}" title="3 farklı rakam girin">
+        </div>
+         <div class="button-group">
+            <button id="create-game-button">Yeni Oyun Kur</button>
+        </div>
+
+        <hr style="margin: 20px 0;">
+
+        <div class="input-group">
+             <label for="game-id-input">Katılmak İçin Oyun ID:</label>
+            <input type="text" id="game-id-input" placeholder="Rakibinizden alın">
+        </div>
+        <div class="button-group">
+            <button id="join-game-button">Oyuna Katıl</button>
+        </div>
+
+        <!-- Oyun ID'si Gösterim Alanı -->
+        <div id="game-id-display"></div>
+    </div>
+
+
+    <!-- Aktif Oyun Alanı -->
     <div id="game-area">
-        <label for="guess-input">Tahmininiz (3 Rakam):</label>
-        <input type="text" id="guess-input" maxlength="3" pattern="\d{3}" title="3 rakam girin">
-        <button id="guess-button">Tahmin Et</button>
-        <button id="new-game-button">Yeni Oyun</button>
+        <div id="turn-indicator">Rakip bekleniyor...</div>
+
+        <div class="input-group">
+            <label for="guess-input">Tahmininiz:</label>
+            <input type="text" id="guess-input" maxlength="3" pattern="\d{3}" title="3 farklı rakam girin" disabled>
+            <button id="guess-button" disabled>Tahmin Et</button>
+        </div>
+
+        <div class="guess-list-container">
+            <div class="guess-list">
+                <h3>Tahminlerim</h3>
+                <ul id="my-guesses-list">
+                    <!-- Benim tahminlerim buraya eklenecek -->
+                </ul>
+            </div>
+            <div class="guess-list">
+                <h3>Rakibin Tahminleri</h3>
+                <ul id="opponent-guesses-list">
+                    <!-- Rakibin tahminleri buraya eklenecek -->
+                </ul>
+            </div>
+        </div>
+
+         <!-- Rakibin Gizli Sayısı (Oyun sonunda) -->
+         <p id="opponent-secret-label"></p>
     </div>
 
-    <div id="message-area">
-        <!-- Mesajlar buraya gelecek -->
-    </div>
-
-    <h2>Tahmin Geçmişi</h2>
-    <ul id="guesses-list">
-        <!-- Tahminler buraya eklenecek -->
-    </ul>
-
+    <!-- Socket.IO İstemci Kütüphanesi -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <!-- Kendi JavaScript Kodumuz -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
