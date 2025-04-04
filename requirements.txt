@@ -1,0 +1,5 @@
+Flask
+Flask-SQLAlchemy
+psycopg2-binary  # PostgreSQL sürücüsü (Render'da çalışır)
+python-dotenv    # .env dosyasını okumak için
+gunicorn         # Render'da uygulamayı çalıştırmak için WSGI sunucusu
